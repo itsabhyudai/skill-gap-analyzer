@@ -1,51 +1,59 @@
 import { motion } from "framer-motion";
 
-const SkillAnalysis = ({ skills }) => {
-  return (
-    <div className="flex flex-col items-center gap-6 p-6">
-      {/* Detected Skills */}
-      <motion.div 
-        className="w-96 bg-white shadow-lg p-6 rounded-lg border-l-4 border-green-500"
-        initial={{ opacity: 0, x: -50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h2 className="text-xl font-bold mb-3 text-green-600">Detected Skills</h2>
-        <ul className="list-disc pl-5 text-gray-700">
-          {skills.detected.map((skill, index) => (
-            <motion.li 
-              key={index} 
-              whileHover={{ scale: 1.1 }} 
-              className="transition-all cursor-pointer"
-            >
-              {skill}
-            </motion.li>
-          ))}
-        </ul>
-      </motion.div>
+function SkillList({ title, items, tone }) {
+  const border =
+    tone === "good"
+      ? "border-[var(--good)]"
+      : tone === "bad"
+        ? "border-[var(--bad)]"
+        : "border-[var(--brand)]";
 
-      {/* Skill Gaps */}
-      <motion.div 
-        className="w-96 bg-white shadow-lg p-6 rounded-lg border-l-4 border-red-500"
-        initial={{ opacity: 0, x: 50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h2 className="text-xl font-bold mb-3 text-red-600">Skill Gaps</h2>
-        <ul className="list-disc pl-5 text-gray-700">
-          {skills.missing.map((skill, index) => (
-            <motion.li 
-              key={index} 
-              whileHover={{ scale: 1.1 }} 
-              className="transition-all cursor-pointer"
+  const heading =
+    tone === "good"
+      ? "text-[var(--good)]"
+      : tone === "bad"
+        ? "text-[var(--bad)]"
+        : "text-[var(--brand)]";
+
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 18 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
+      className={`surface rounded-2xl border-l-4 p-6 ${border}`}
+    >
+      <div className="mb-4 flex items-baseline justify-between gap-3">
+        <h3 className={`font-display text-xl font-bold ${heading}`}>{title}</h3>
+        <span className="muted text-sm">{items.length}</span>
+      </div>
+
+      {items.length === 0 ? (
+        <p className="muted text-sm">Nothing here yet.</p>
+      ) : (
+        <ul className="flex flex-wrap gap-2">
+          {items.map((skill) => (
+            <li
+              key={skill.id || skill.name}
+              className="rounded-full border border-[var(--line)] bg-white/70 px-3 py-1 text-sm font-medium"
             >
-              {skill}
-            </motion.li>
+              {skill.name}
+            </li>
           ))}
         </ul>
-      </motion.div>
+      )}
+    </motion.section>
+  );
+}
+
+export default function SkillAnalysis({ analysis }) {
+  if (!analysis) return null;
+
+  return (
+    <div className="grid gap-4 lg:grid-cols-3">
+      <SkillList title="Matched" items={analysis.matched || []} tone="good" />
+      <SkillList title="Skill gaps" items={analysis.missing || []} tone="bad" />
+      <SkillList title="Bonus skills" items={analysis.bonus || []} tone="brand" />
     </div>
   );
-};
-
-export default SkillAnalysis;
+}

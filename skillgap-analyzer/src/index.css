@@ -1,3 +1,110 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --bg: #e8efe9;
+  --bg-deep: #d5e2d8;
+  --ink: #0c1f17;
+  --muted: #4d6358;
+  --brand: #0a5c40;
+  --brand-soft: #137a56;
+  --accent: #ff5c1a;
+  --accent-soft: #ff8a55;
+  --surface: rgba(255, 255, 255, 0.78);
+  --line: rgba(12, 31, 23, 0.12);
+  --good: #0f7a4b;
+  --warn: #b45309;
+  --bad: #b42318;
+  --font-display: "Syne", sans-serif;
+  --font-body: "Outfit", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(255, 92, 26, 0.14), transparent 55%),
+    radial-gradient(900px 500px at -10% 20%, rgba(10, 92, 64, 0.16), transparent 50%),
+    linear-gradient(165deg, #f4f7f4 0%, var(--bg) 45%, var(--bg-deep) 100%);
+  background-attachment: fixed;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+}
+
+::selection {
+  background: rgba(10, 92, 64, 0.22);
+}
+
+@layer components {
+  .shell {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white transition;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-soft) 100%);
+    box-shadow: 0 10px 30px rgba(10, 92, 64, 0.25);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition;
+    color: var(--ink);
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.45);
+  }
+
+  .btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  .surface {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    backdrop-filter: blur(12px);
+  }
+
+  .muted {
+    color: var(--muted);
+  }
+
+  .grid-noise {
+    background-image:
+      linear-gradient(rgba(12, 31, 23, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(12, 31, 23, 0.04) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+}
