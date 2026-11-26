@@ -1,20 +1,24 @@
-import { useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import ResumeUpload from "./components/ResumeUpload";
-import SkillAnalysis from "./components/SkillAnalysis";
+import Footer from "./components/Footer";
+import Home from "./pages/Home";
+import Analyze from "./pages/Analyze";
+import Results from "./pages/Results";
 
-function App() {
-  const [skills, setSkills] = useState(null);
-
+export default function App() {
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Navbar />
-      <div className="flex flex-col items-center gap-8 p-6">
-        <ResumeUpload onAnalyze={setSkills} />
-        {skills && <SkillAnalysis skills={skills} />}
+    <BrowserRouter>
+      <div className="flex min-h-screen flex-col">
+        <Navbar />
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/analyze" element={<Analyze />} />
+            <Route path="/results" element={<Results />} />
+          </Routes>
+        </main>
+        <Footer />
       </div>
-    </div>
+    </BrowserRouter>
   );
 }
-
-export default App;

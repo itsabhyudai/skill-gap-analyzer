@@ -1,0 +1,13 @@
+{
+  "name": "skill-gap-analyzer",
+  "private": true,
+  "version": "2.0.0",
+  "description": "SkillGap — resume skill-gap analysis platform",
+  "scripts": {
+    "install:all": "npm install --prefix backend && npm install --prefix skillgap-analyzer",
+    "dev:api": "npm start --prefix backend",
+    "dev:web": "npm run dev --prefix skillgap-analyzer",
+    "build:web": "npm run build --prefix skillgap-analyzer",
+    "test:api": "node backend/scripts/smoke-test.js"
+  }
+}

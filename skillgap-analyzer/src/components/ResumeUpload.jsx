@@ -1,74 +1,93 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import axios from "axios";
 
-const ResumeUpload = ({ onAnalyze }) => {
-  const [file, setFile] = useState(null);
-  const [loading, setLoading] = useState(false);
+const MAX_MB = 5;
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
+export default function ResumeUpload({ file, onFileChange, disabled }) {
+  const inputRef = useRef(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [localError, setLocalError] = useState("");
 
-  const handleAnalyze = async () => {
-    if (!file) return;
-    setLoading(true);
+  const validateAndSet = (nextFile) => {
+    setLocalError("");
+    if (!nextFile) return;
 
-    const formData = new FormData();
-    formData.append("resume", file);
+    const isPdf =
+      nextFile.type === "application/pdf" ||
+      nextFile.name.toLowerCase().endsWith(".pdf");
 
-    try {
-      const response = await axios.post("http://localhost:5000/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
-      onAnalyze(response.data); // Pass skills to parent component
-    } catch (error) {
-      console.error("Error analyzing resume:", error);
+    if (!isPdf) {
+      setLocalError("Please upload a PDF resume.");
+      onFileChange(null);
+      return;
     }
 
-    setLoading(false);
+    if (nextFile.size > MAX_MB * 1024 * 1024) {
+      setLocalError(`File is too large. Max ${MAX_MB} MB.`);
+      onFileChange(null);
+      return;
+    }
+
+    onFileChange(nextFile);
+  };
+
+  const onDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    const dropped = e.dataTransfer.files?.[0];
+    validateAndSet(dropped);
   };
 
   return (
-    <motion.div 
-      className="p-6 bg-white shadow-md rounded-lg w-96 text-center border border-gray-300"
-      initial={{ scale: 0.9, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.3 }}
-    >
-      <h2 className="text-lg font-semibold mb-4 text-gray-700">
-        Upload Your Resume (PDF)
-      </h2>
-
-      {/* File Upload */}
-      <label className="cursor-pointer border-2 border-dashed border-gray-400 p-4 w-full block rounded-md hover:bg-gray-50 transition-all">
-        <input 
-          type="file" 
-          accept=".pdf" 
-          onChange={handleFileChange} 
+    <div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={onDrop}
+        className={`rounded-2xl border-2 border-dashed p-8 text-center transition ${
+          dragOver
+            ? "border-[var(--brand)] bg-[rgba(10,92,64,0.08)]"
+            : "border-[var(--line)] bg-white/50"
+        }`}
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          accept="application/pdf,.pdf"
           className="hidden"
+          disabled={disabled}
+          onChange={(e) => validateAndSet(e.target.files?.[0] || null)}
         />
-        <p className="text-gray-500">Click to upload file</p>
-      </label>
 
-      {/* File Name */}
-      {file && <p className="text-green-600 mt-3 font-medium">✔ {file.name}</p>}
+        <p className="font-display text-xl font-bold">Drop your resume PDF</p>
+        <p className="muted mt-2 text-sm">or click to browse · max {MAX_MB} MB · text-based PDFs work best</p>
 
-      {/* Analyze Button */}
-      {file && (
-        <motion.button
-          className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          onClick={handleAnalyze}
-          disabled={loading}
+        <button
+          type="button"
+          className="btn-ghost mt-5"
+          disabled={disabled}
+          onClick={() => inputRef.current?.click()}
         >
-          {loading ? "Analyzing..." : "Analyze Resume"}
-        </motion.button>
-      )}
-    </motion.div>
-  );
-};
+          Choose file
+        </button>
 
-export default ResumeUpload;
+        {file && (
+          <p className="mt-4 text-sm font-medium text-[var(--good)]">
+            Ready: {file.name} ({(file.size / 1024).toFixed(0)} KB)
+          </p>
+        )}
+      </motion.div>
+
+      {localError && (
+        <p className="mt-3 text-sm font-medium text-[var(--bad)]" role="alert">
+          {localError}
+        </p>
+      )}
+    </div>
+  );
+}
